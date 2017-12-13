@@ -1,6 +1,6 @@
 console.log("here");
 $(function () {
-    console.log("here");
+    console.log(g);
     var ctx = $('#chart');
     var chart = new Chart(ctx, {
         type: 'bar',

@@ -13,21 +13,41 @@ class ApplicationController < ActionController::API
           password: 'streem'
 
         }], log: true, reload_connections: true
-    data = JSON.parse(request.body.string)
-    response = Array.new
+    begin
+      data = JSON.parse(request.body.string)
+    rescue
+      render :elastic_test
+      return
+    end
+
+    $response = Array.new
+    $urls = Array.new
+    $before = data['before']
+    $after = data['after']
+    $interval = data['interval'].scan(/\d/).join('')
+    $interval = $interval.to_i
+    $interval = $interval * 60 * 1000 #assuming the time intervals is in minutes
     $hits = Array.new
+    
     i = 0
     while i < data['urls'].length do
       begin
-        response[i] = client.search q: data['urls'][i]
-        $hits[i] = response[i]['hits']['total']
-      rescue
-      response[i] = ""
-      $hits[i] = 0
+        $response[i] = client.search index: "events", body: { query: { range: { derived_tstamp:{"gte": $before, "lte": $after } } } }
+        $urls[i] = data['urls'][i]
+        $hits[i] = $response[i]['hits']['total']
+        p("The response from " + data['urls'][i] + ":")
+        p($response[i])
+      rescue Exception => x
+        $response[i] = "An error of type #{x.class} occurred."
+        p("The response from " + data['urls'][i] + ":")
+        p($response[i])
+        $hits[i] = 0
       end
       i+=1
     end
-    render plain: $hits
+
+    render :elastic_test
   end
-end
+  end
+
 
