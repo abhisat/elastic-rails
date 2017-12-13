@@ -13,21 +13,21 @@ class ApplicationController < ActionController::API
           password: 'streem'
 
         }], log: true, reload_connections: true
-
-    begin
-        data = JSON.parse(request.body.string)
-        p(data['urls'])
-        client.cluster.health
-        i = 0
-        response = Array.new
-        while i<data['urls'].length do
-          response[i] = client.search q: data['urls'][i]
-          i+=1
-        end
-        render plain: response
-    rescue
-      render :elastic_test
+    data = JSON.parse(request.body.string)
+    response = Array.new
+    $hits = Array.new
+    i = 0
+    while i < data['urls'].length do
+      begin
+        response[i] = client.search q: data['urls'][i]
+        $hits[i] = response[i]['hits']['total']
+      rescue
+      response[i] = ""
+      $hits[i] = 0
+      end
+      i+=1
     end
+    render plain: $hits
   end
 end
 
