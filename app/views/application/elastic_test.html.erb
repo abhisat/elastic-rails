@@ -1,52 +1,58 @@
 
-
-<%= javascript_include_tag('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js') %>
-<%= javascript_include_tag('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js') %>
+<%= javascript_include_tag('https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.31.2/plotly.min.js') %>
 <%= javascript_include_tag('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js') %>
 
-<canvas id="chart" class="chart" width="500" height="500"></canvas>
-
+<div id="chart" class="chart" width="500" height="500"></div>
+<div id = "urls" style="display: none" ><%= $urls.inspect %></div>
+<div id = "hits" style="display: none"><%= $hits.inspect %></div>\
+<div id = "labels" style="display: none"><%= $labels.inspect %></div>
 <script>
 
-  console.log(gon.t)
+    var yl = [];
 
-  var ctx = document.getElementById("chart");
-  var chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-          labels: gon.labels,
-          datasets: [{
-              label: '# of Votes',
-              data: [12, 19, 3, 5, 2, 3],
-              backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(255, 206, 86, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(153, 102, 255, 0.2)',
-                  'rgba(255, 159, 64, 0.2)'
-              ],
-              borderColor: [
-                  'rgba(255,99,132,1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)'
-              ],
-              borderWidth: 1
-          }]
-      },
-      options: {
-          scales: {
-              yAxes: [{
-                  ticks: {
-                      beginAtZero:true
-                  }
-              }]
-          }
-      }
+  var urls = document.getElementById('urls').innerHTML.match(/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi);
+  var labels = document.getElementById('labels').innerHTML.match(/[0-9]+(,[0-9]+)*/gi).map(Number);
+  var hits = document.getElementById('hits').innerHTML;
+  hits = hits.substring(1, hits.length - 1)
+    hits = hits.match(/\[(.*?)\]/gi);
+  for(var i = 0; i < hits.length; i++){
+      yl[i] = hits[i].match(/[0-9]+(,[0-9]+)*/gi).map(Number);
+  }
+    var colors = []
+    for(var i = 0; i < labels.length; i++){
+      colors[i] = "rgba(" + Math.random() * (255) + ", " + Math.random() * (255) + "," + Math.random() * (255) + ", 0.7)";
+    }
 
-  });
+  var trace = [];
+  for(var l = 0; l < urls.length; l++){
+
+      trace[l] = {
+          x: labels,
+          y: yl[l],
+          name: urls[l],
+          histnorm: "count",
+          marker: {
+              color: colors[l],
+              line: {
+                  color:  "rgba(0, 0, 0, 1)",
+                  width: 1
+              }
+          },
+          opacity: 0.5,
+          type: "bar",
+
+      };
+  }
+    var data = trace;
+    var layout = {
+        bargap: 0.05,
+        bargroupgap: 0.2,
+        barmode: "stack",
+        title: "Page Hits Histogram",
+        xaxis: {title: "Timestamp"},
+        yaxis: {title: "Count"}
+    };
+
+    Plotly.newPlot('chart', data, layout);
 
 </script>
