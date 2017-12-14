@@ -12,6 +12,9 @@
 
   var urls = document.getElementById('urls').innerHTML.match(/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi);
   var labels = document.getElementById('labels').innerHTML.match(/[0-9]+(,[0-9]+)*/gi).map(Number);
+    for(var i = 0; i < labels.length; i++){
+        labels[i] = new Date(labels[i]).toLocaleTimeString();
+    }
   var hits = document.getElementById('hits').innerHTML;
   hits = hits.substring(1, hits.length - 1)
     hits = hits.match(/\[(.*?)\]/gi);

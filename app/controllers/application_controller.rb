@@ -20,7 +20,6 @@ class ApplicationController < ActionController::API
       render :elastic_test
       return
     end
-    $urltest = ["http://www.news.com.au/travel/travel-updates/incidents/disruptive-passenger-grounds-flight-after-storming-cockpit/news-story/5949c1e9542df41fb89e6cdcdc16b615","http://www.smh.com.au/sport/tennis/an-open-letter-from-martina-navratilova-to-margaret-court-arena-20170601-gwhuyx.html","http://www.smh.com.au/nsw/premier-gladys-berejiklian-announces-housing-affordability-reforms-20170601-gwi0jn.html","http://www.news.com.au/technology/environment/trump-pulls-us-out-of-paris-climate-agreement/news-story/f5c30a07c595a10a81d67611d0515a0a"]
     $response = Hash.new
     $mainresponse = Array.new
     $urls = Array.new
@@ -35,7 +34,7 @@ class ApplicationController < ActionController::API
     p(data['urls'])
     j = 0
     k = 0
-    while j < $urltest.length do
+    while j < data['urls'].length do
       begin
         $mainresponse[j] = client.search q: data['urls'][j]
         $totalhits[j] = $mainresponse[j]['hits']['total']
