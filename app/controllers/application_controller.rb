@@ -36,7 +36,26 @@ class ApplicationController < ActionController::API
     k = 0
     while j < data['urls'].length do
       begin
-        $mainresponse[j] = client.search q: data['urls'][j]
+        $mainresponse[j] = client.search index: 'events',
+                                         body: {query:
+                                                    { query_string:
+                                                          { query: data['urls'][j]}},
+                                                range: {
+                                                    derived_tstamp: {
+                                                        gte: 10,
+                                                        lte: 20,
+                                                    }
+                                                },
+                                                aggs:
+                                                    { by_page_views:
+                                                         { date_histogram:
+                                                               { field: "derived_tstamp",
+                                                                 interval: "200m",
+                                                                 min_doc_count: 1
+                                                               }
+                                                         }
+                                                    }
+                                         }
         $totalhits[j] = $mainresponse[j]['hits']['total']
         p("The response from " + data['urls'][j] + ":")
         p($mainresponse[j])
@@ -46,37 +65,49 @@ class ApplicationController < ActionController::API
         p($response[j])
         $totalhits[j] = 0
       end
-      $urls[j] = data['urls'][j]
-      loop = $before.to_i
-      $temphits = Array.new
+      # $urls[j] = data['urls'][j]
+      # loop = $before.to_i
+      # $temphits = Array.new
 
-      while loop <= $after.to_i
-        loopbefore = $before.to_i
-        loopafter = $before.to_i + $interval.to_i
-
-        begin
-          temp = client.search index: "events", body: { query: { range: { derived_tstamp:{"gte": loopbefore, "lte": loopafter } } } }
-          $response[$urls[j]] = temp
-          $temphits.push(temp['hits']['total'])
-          p("The response from " + data['urls'][j] + ":")
-          p($response[$urls[j]])
-        rescue Exception => x
-          $response[$urls[j]] = "An error of type #{x.class} occurred."
-          p("The response from " + data['urls'][j] + ":")
-          p($response[$urls[j]])
-          $temphits.push (0)
-        end
-        $labels.push(loop)
-        loopbefore += $interval.to_i
-        loopafter += $interval.to_i
-        loop = loop + $interval.to_i
-        k+=1
-
-      end
-      $hits[j] = $temphits
+      # while loop <= $after.to_i
+      #   loopbefore = $before.to_i
+      #   loopafter = $before.to_i + $interval.to_i
+      #
+      #   begin
+      #     temp = client.search index: 'events',
+      #                          body: {query:
+      #                                     { query_string:
+      #                                           { query: data['urls'][j]}},
+      #                                 aggs:
+      #                                 {by_page_views:
+      #                                     { date_histogram:
+      #                                           {field: "derived_tstamp",
+      #                                                  interval: "2m"
+      #     }
+      #     }
+      #     }
+      #                          }
+      #     $response[$urls[j]] = temp
+      #     $temphits.push(temp['hits']['total'])
+      #     p("The response from " + data['urls'][j] + ":")
+      #     p($response[$urls[j]])
+      #   rescue Exception => x
+      #     $response[$urls[j]] = "An error of type #{x.class} occurred."
+      #     p("The response from " + data['urls'][j] + ":")
+      #     p($response[$urls[j]])
+      #     $temphits.push (0)
+      #   end
+      #   $labels.push(loop)
+      #   loopbefore += $interval.to_i
+      #   loopafter += $interval.to_i
+      #   loop = loop + $interval.to_i
+      #   k+=1
+      #
+      # end
+      # $hits[j] = $temphits
       j+=1
     end
-    $labels = $labels.uniq
+    #$labels = $labels.uniq
     render :elastic_test
   end
   end
