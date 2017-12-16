@@ -54,7 +54,6 @@
     <orderEntry type="library" scope="PROVIDED" name="faraday (v0.13.1, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ffi (v1.9.18, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v0.4.1, RVM: ruby-2.4.1) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="gon (v6.2.0, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v0.9.1, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="jbuilder (v2.7.0, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="json (v2.0.2, RVM: ruby-2.4.1) [gem]" level="application" />
@@ -72,6 +71,7 @@
     <orderEntry type="library" scope="PROVIDED" name="public_suffix (v3.0.1, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="puma (v3.11.0, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rack (v2.0.3, RVM: ruby-2.4.1) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rack-cors (v1.0.2, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rack-test (v0.8.2, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rails (v5.1.4, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rails-dom-testing (v2.0.3, RVM: ruby-2.4.1) [gem]" level="application" />
@@ -80,7 +80,6 @@
     <orderEntry type="library" scope="PROVIDED" name="rake (v12.3.0, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rb-fsevent (v0.10.2, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rb-inotify (v0.9.10, RVM: ruby-2.4.1) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="request_store (v1.3.2, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby_dep (v1.5.0, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubyzip (v1.2.1, RVM: ruby-2.4.1) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sass (v3.5.3, RVM: ruby-2.4.1) [gem]" level="application" />

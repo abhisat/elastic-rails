@@ -1,114 +1,88 @@
 require 'elasticsearch'
 require 'json'
 class ApplicationController < ActionController::API
-  #protect_from_forgery with: :exception
 
-  def elastic_test
-    $test = [1,2,4,5,6,5]
+  def page_views
+
+    # Code for connecting the rails API to the Elastic Search server
     client = Elasticsearch::Client.new transport_options: {
         request: { timeout: 10000 },
     }, retry_on_failure: true, hosts:[
-        { host: 'test.es.streem.com.au',
-          port: '9200',
-          user: 'elastic',
-          password: 'streem'
+            { host: 'test.es.streem.com.au',
+              port: '9200',
+              user: 'elastic',
+              password: 'streem'
 
         }], log: true, reload_connections: true
+    # Code for connecting the rails API to the Elastic Search server
+
+    # Code to parse the GET request body to JSON and handle an exception if thrown while parsing.
     begin
       data = JSON.parse(request.body.string)
     rescue
-      render :elastic_test
+      render plain: "Error in parsing request body."
       return
     end
-    $response = Hash.new
-    $mainresponse = Array.new
-    $urls = Array.new
-    $totalhits = Array.new
-    $labels = Array.new
-    $before = data['before']
-    $after = data['after']
-    $interval = data['interval'].scan(/\d/).join('')
-    $interval = $interval.to_i
-    $interval = $interval * 60 * 1000 #assuming the time intervals is in minutes
-    $hits = Array.new
-    p(data['urls'])
+    # Code to parse the GET request body to JSON and handle an exception if thrown while parsing.
+
+    # mainResponse array stores the responses returned for each url aggregation query on elastic search
+    $mainResponse = Array.new
+
+    # totalHits array stores the total number of hits for each url aggregation query on elastic search
+    $totalHits = Array.new
+
     j = 0
-    k = 0
+
+    # WHILE loop to do histogram aggregation query on each url in the urls array in request body
     while j < data['urls'].length do
       begin
-        $mainresponse[j] = client.search index: 'events',
-                                         body: {query:
-                                                    { query_string:
-                                                          { query: data['urls'][j]}},
-                                                range: {
-                                                    derived_tstamp: {
-                                                        gte: 10,
-                                                        lte: 20,
-                                                    }
-                                                },
-                                                aggs:
-                                                    { by_page_views:
-                                                         { date_histogram:
-                                                               { field: "derived_tstamp",
-                                                                 interval: "200m",
-                                                                 min_doc_count: 1
-                                                               }
+        $mainResponse[j] = client.search index: 'events',
+                                         body: {
+                                             query: {
+                                                 bool: {
+                                                     must: [
+                                                         {
+                                                             query_string: {
+                                                                 query: data['urls'][j]
+                                                             }
+                                                         },
+                                                         {
+                                                             range: {
+                                                                 derived_tstamp: {
+                                                                     gte: data['before'],
+                                                                     lte: data['after']
+                                                                 }
+                                                             }
                                                          }
-                                                    }
+                                                     ]
+                                                 }
+                                             },
+                                             aggs:
+                                                 { by_page_views:
+                                                       { date_histogram:
+                                                             { field: "derived_tstamp",
+                                                               interval: data['interval'],
+                                                             }
+                                                       }
+                                                 }
                                          }
-        $totalhits[j] = $mainresponse[j]['hits']['total']
+        $totalHits[j] = $mainResponse[j]['hits']['total']
         p("The response from " + data['urls'][j] + ":")
-        p($mainresponse[j])
-      rescue Exception => x
-        $mainresponse[j] = "An error of type #{x.class} occurred."
-        p("The response from " + data['urls'][j] + ":")
-        p($response[j])
-        $totalhits[j] = 0
-      end
-      # $urls[j] = data['urls'][j]
-      # loop = $before.to_i
-      # $temphits = Array.new
+        p($mainResponse[j])
 
-      # while loop <= $after.to_i
-      #   loopbefore = $before.to_i
-      #   loopafter = $before.to_i + $interval.to_i
-      #
-      #   begin
-      #     temp = client.search index: 'events',
-      #                          body: {query:
-      #                                     { query_string:
-      #                                           { query: data['urls'][j]}},
-      #                                 aggs:
-      #                                 {by_page_views:
-      #                                     { date_histogram:
-      #                                           {field: "derived_tstamp",
-      #                                                  interval: "2m"
-      #     }
-      #     }
-      #     }
-      #                          }
-      #     $response[$urls[j]] = temp
-      #     $temphits.push(temp['hits']['total'])
-      #     p("The response from " + data['urls'][j] + ":")
-      #     p($response[$urls[j]])
-      #   rescue Exception => x
-      #     $response[$urls[j]] = "An error of type #{x.class} occurred."
-      #     p("The response from " + data['urls'][j] + ":")
-      #     p($response[$urls[j]])
-      #     $temphits.push (0)
-      #   end
-      #   $labels.push(loop)
-      #   loopbefore += $interval.to_i
-      #   loopafter += $interval.to_i
-      #   loop = loop + $interval.to_i
-      #   k+=1
-      #
-      # end
-      # $hits[j] = $temphits
+      # Handle exception while parsing each url query and print out the exception to console
+      rescue Exception => x
+        $mainResponse[j] = "An error of type #{x.class} occurred."
+        $totalHits[j] = 0
+        p("The response from " + data['urls'][j] + ":")
+        p($mainResponse[j])
+      end
       j+=1
     end
-    #$labels = $labels.uniq
-    render :elastic_test
+    # WHILE loop to do histogram aggregation query on each url in the urls array in request body
+
+    # Return the responses for each url aggregation query in JSON
+    render json: $mainResponse
   end
   end
 
